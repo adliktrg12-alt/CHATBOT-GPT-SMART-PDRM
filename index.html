@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SMART PDRM Kuantan – Landing Page GPT</title>
+
+  <style>
+    :root{
+      /* Cyber Crimson + Magenta (NO blue) */
+      --bg0:#050308;
+      --bg1:#0b0411;
+      --bg2:#130611;
+
+      --ink:#f8fafc;
+      --muted:rgba(248,250,252,.72);
+
+      --line:rgba(255,255,255,.14);
+      --glass:rgba(255,255,255,.06);
+
+      --mag:#ff3aa8;
+      --crim:#ff2e2e;
+      --gold:#fbbf24;
+
+      --shadow: 0 16px 40px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius2: 26px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,"Helvetica Neue",Arial;
+      color:var(--ink);
+      background:
+        radial-gradient(1000px 800px at 20% -10%, rgba(255,58,168,.18), transparent 55%),
+        radial-gradient(900px 700px at 90% 10%, rgba(255,46,46,.14), transparent 55%),
+        radial-gradient(900px 900px at 50% 120%, rgba(251,191,36,.10), transparent 60%),
+        linear-gradient(180deg, var(--bg2), var(--bg0) 55%, #000 120%);
+      overflow-x:hidden;
+    }
+
+    /* AI / Digital layers */
+    .ai-layers{
+      position:fixed;
+      inset:0;
+      z-index:0;
+      pointer-events:none;
+    }
+    /* subtle grid */
+    .grid{
+      position:absolute; inset:0;
+      background:
+        linear-gradient(to right, rgba(255,255,255,.06) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,.05) 1px, transparent 1px);
+      background-size: 46px 46px;
+      opacity:.22;
+      mask-image: radial-gradient(circle at 50% 20%, rgba(0,0,0,1), rgba(0,0,0,.35) 55%, transparent 80%);
+    }
+    /* scan lines */
+    .scan{
+      position:absolute; inset:-40% -10%;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.06) 0px,
+        rgba(255,255,255,.06) 1px,
+        transparent 4px,
+        transparent 10px
+      );
+      opacity:.12;
+      transform: rotate(-6deg);
+      animation: drift 18s linear infinite;
+    }
+    @keyframes drift{
+      from{ transform: translateY(-10%) rotate(-6deg); }
+      to  { transform: translateY(10%)  rotate(-6deg); }
+    }
+
+    /* neon blobs */
+    .blob{
+      position:absolute;
+      width:620px; height:620px;
+      border-radius:999px;
+      filter: blur(26px);
+      opacity:.22;
+      mix-blend-mode:screen;
+      animation: floaty 12s ease-in-out infinite;
+    }
+    .b1{ left:-180px; top:-160px; background: radial-gradient(circle, rgba(255,58,168,.85), transparent 62%); }
+    .b2{ right:-220px; top:-120px; background: radial-gradient(circle, rgba(255,46,46,.75), transparent 62%); animation-duration: 14s;}
+    .b3{ left:20%; bottom:-280px; background: radial-gradient(circle, rgba(251,191,36,.55), transparent 62%); animation-duration: 16s;}
+
+    @keyframes floaty{
+      0%,100%{ transform: translate(0,0) scale(1); }
+      50%{ transform: translate(18px, -14px) scale(1.03); }
+    }
+
+    /* particles (pure CSS dots) */
+    .dots{
+      position:absolute; inset:0;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(255,255,255,.35) 1px, transparent 2px),
+        radial-gradient(circle at 30% 70%, rgba(255,58,168,.35) 1px, transparent 2px),
+        radial-gradient(circle at 65% 30%, rgba(255,46,46,.35) 1px, transparent 2px),
+        radial-gradient(circle at 80% 80%, rgba(251,191,36,.35) 1px, transparent 2px),
+        radial-gradient(circle at 55% 55%, rgba(255,255,255,.22) 1px, transparent 2px);
+      background-size: 380px 380px;
+      opacity:.18;
+      animation: dotsMove 22s linear infinite;
+    }
+    @keyframes dotsMove{
+      from{ transform: translateY(0); }
+      to  { transform: translateY(60px); }
+    }
+
+    /* layout */
+    .wrap{ position:relative; z-index:1; }
+    header{
+      padding: 22px 14px 10px;
+      text-align:center;
+    }
+    .top{
+      max-width: 980px;
+      margin: 0 auto;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:10px;
+    }
+    .logo{
+      width:118px;
+      height:auto;
+      display:block;
+      filter: drop-shadow(0 0 14px rgba(255,58,168,.22));
+    }
+
+    .badge{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      padding: 8px 12px;
+      border:1px solid var(--line);
+      border-radius:999px;
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(8px);
+      font-size:12px;
+      color: var(--muted);
+    }
+    .dot{
+      width:8px;height:8px;border-radius:999px;
+      background: radial-gradient(circle, var(--mag), rgba(255,58,168,.15));
+      box-shadow: 0 0 12px rgba(255,58,168,.45);
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse{
+      0%,100%{ transform: scale(1); opacity:.85;}
+      50%{ transform: scale(1.35); opacity:1;}
+    }
+
+    .title{
+      margin-top:4px;
+      font-size: 28px;
+      line-height:1.1;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .subtitle{
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+      letter-spacing: .6px;
+    }
+
+    nav{
+      margin-top: 14px;
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .pill{
+      text-decoration:none;
+      color: rgba(248,250,252,.92);
+      font-size: 13px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      backdrop-filter: blur(8px);
+      transition: transform .15s ease, background .15s ease, border-color .15s ease;
+    }
+    .pill:hover{ background: rgba(255,255,255,.08); transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
+    .pill:active{ transform: translateY(0px) scale(.99); }
+
+    /* hero */
+    .hero{
+      max-width: 980px;
+      margin: 18px auto 0;
+      padding: 0 16px;
+      text-align:center;
+    }
+    .hero h1{
+      margin:0;
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing:.2px;
+    }
+    .hero p{
+      margin: 10px auto 0;
+      max-width: 860px;
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* AI notice */
+    .notice{
+      max-width: 980px;
+      margin: 16px auto 0;
+      padding: 0 16px;
+    }
+    .notice .card{
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.04));
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      padding: 14px 14px;
+      text-align:left;
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+    }
+    .chip{
+      flex:0 0 auto;
+      width:42px;height:42px;border-radius:14px;
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,58,168,.7), transparent 60%),
+        radial-gradient(circle at 70% 60%, rgba(255,46,46,.55), transparent 62%),
+        rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 0 18px rgba(255,58,168,.18);
+    }
+    .notice b{ color: rgba(248,250,252,.96); }
+    .notice p{
+      margin:0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* moving tagline */
+    .tagline-strip{
+      max-width: 980px;
+      margin: 18px auto 0;
+      padding: 0 16px;
+    }
+    .strip{
+      overflow:hidden;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 26px rgba(0,0,0,.35);
+    }
+    .marquee{
+      display:flex;
+      white-space:nowrap;
+      gap: 28px;
+      padding: 10px 0;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(248,250,252,.82);
+      animation: marquee 16s linear infinite;
+    }
+    .marquee span{
+      padding: 0 18px;
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+    }
+    .marquee i{
+      width:7px;height:7px;border-radius:999px;
+      background: rgba(255,255,255,.45);
+      box-shadow: 0 0 12px rgba(255,255,255,.25);
+      display:inline-block;
+    }
+    @keyframes marquee{
+      0%{ transform: translateX(0); }
+      100%{ transform: translateX(-50%); }
+    }
+
+    /* sections */
+    .section{
+      max-width: 980px;
+      margin: 22px auto 0;
+      padding: 0 16px;
+    }
+    .section h2{
+      margin: 0 0 10px;
+      font-size: 20px;
+      letter-spacing: .2px;
+    }
+    .section p{
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* quick stats */
+    .stats{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .stat{
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(10px);
+      padding: 14px;
+      box-shadow: 0 10px 28px rgba(0,0,0,.35);
+    }
+    .stat .k{
+      font-size: 12px;
+      color: rgba(248,250,252,.65);
+      letter-spacing: .6px;
+      text-transform: uppercase;
+    }
+    .stat .v{
+      margin-top: 6px;
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+
+    /* GPT grid */
+    .gpt-grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 14px;
+      margin-top: 12px;
+    }
+    .gpt-card{
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      backdrop-filter: blur(10px);
+      padding: 16px;
+      box-shadow: 0 12px 30px rgba(0,0,0,.42);
+      position:relative;
+      overflow:hidden;
+      transition: transform .15s ease, border-color .15s ease, background .15s ease;
+    }
+    .gpt-card:hover{
+      transform: translateY(-2px);
+      border-color: rgba(255,255,255,.22);
+      background: rgba(255,255,255,.07);
+    }
+    .gpt-card:before{
+      content:"";
+      position:absolute;
+      inset:-2px;
+      background:
+        radial-gradient(300px 120px at 15% 10%, rgba(255,58,168,.18), transparent 60%),
+        radial-gradient(260px 120px at 85% 20%, rgba(255,46,46,.14), transparent 60%),
+        radial-gradient(240px 120px at 55% 100%, rgba(251,191,36,.10), transparent 62%);
+      opacity:.8;
+      pointer-events:none;
+    }
+    .gpt-card > *{ position:relative; z-index:1; }
+
+    .gpt-title{
+      font-size: 15px;
+      font-weight: 900;
+      margin: 0 0 6px;
+      letter-spacing:.2px;
+    }
+    .gpt-desc{
+      margin:0 0 12px;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height:1.45;
+    }
+
+    .btns{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing:.2px;
+      text-decoration:none;
+      border: 1px solid rgba(255,255,255,.16);
+      transition: transform .15s ease, opacity .15s ease, background .15s ease, border-color .15s ease;
+      user-select:none;
+    }
+    .btn:active{ transform: translateY(1px) scale(.99); }
+
+    .btn-open{
+      color:#000;
+      background: linear-gradient(135deg, var(--gold), rgba(255,58,168,.85));
+      border-color: rgba(255,255,255,.10);
+      box-shadow: 0 14px 28px rgba(0,0,0,.35);
+    }
+    .btn-open:hover{ opacity:.92; }
+
+    .btn-copy{
+      color: rgba(248,250,252,.92);
+      background: rgba(255,255,255,.05);
+    }
+    .btn-copy:hover{ background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); }
+
+    /* Social buttons */
+    .social{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .btn-social{
+      background: rgba(255,255,255,.05);
+      color: rgba(248,250,252,.92);
+    }
+    .btn-social:hover{ background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.22); }
+
+    /* footer */
+    footer{
+      text-align:center;
+      padding: 26px 12px;
+      margin-top: 20px;
+      color: rgba(248,250,252,.55);
+      font-size: 11px;
+    }
+
+    /* reveal on scroll */
+    .reveal{
+      opacity:0;
+      transform: translateY(14px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.show{
+      opacity:1;
+      transform: translateY(0);
+    }
+
+    /* toast */
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(0,0,0,.55);
+      border: 1px solid rgba(255,255,255,.18);
+      backdrop-filter: blur(10px);
+      color: rgba(248,250,252,.92);
+      padding: 10px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .25s ease, transform .25s ease;
+      z-index: 9;
+    }
+    .toast.show{
+      opacity:1;
+      transform: translateX(-50%) translateY(-4px);
+    }
+
+    /* small */
+    @media (max-width:520px){
+      .title{font-size:24px}
+      .hero h1{font-size:22px}
+      .logo{width:106px}
+    }
+  </style>
+</head>
+
+<body>
+  <!-- AI background layers -->
+  <div class="ai-layers" aria-hidden="true">
+    <div class="blob b1"></div>
+    <div class="blob b2"></div>
+    <div class="blob b3"></div>
+    <div class="grid"></div>
+    <div class="scan"></div>
+    <div class="dots"></div>
+  </div>
+
+  <div class="wrap">
+    <header class="reveal">
+      <div class="top">
+        <img
+          class="logo"
+          src="https://arleta.site/interactivelink/1247/logo-group-whatsapp.png"
+          alt="Logo SMART PDRM Kuantan"
+        />
+
+        <div class="badge">
+          <span class="dot"></span>
+          <span>AI • Digitalisasi • Pendidikan & Pencegahan Jenayah</span>
+        </div>
+
+        <div class="title">SMART PDRM KUANTAN</div>
+        <div class="subtitle">Pusat Akses Rasmi GPT – IPD Kuantan</div>
+
+        <nav>
+          <a class="pill" href="#about">Objektif</a>
+          <a class="pill" href="#gpt">Senarai GPT</a>
+          <a class="pill" href="#social">Media Sosial</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero reveal">
+      <h1>Pusat Akses Rasmi GPT SMART PDRM Kuantan</h1>
+      <p>
+        Semua modul GPT pendidikan & pencegahan jenayah di bawah SMART PDRM digabungkan dalam satu platform —
+        mudah, cepat dan sesuai digunakan untuk ceramah, taklimat, sekolah, komuniti dan operasi PDRM.
+      </p>
+    </section>
+
+    <!-- AI + Malaysia tuning statement -->
+    <section class="notice reveal">
+      <div class="card">
+        <div class="chip" aria-hidden="true"></div>
+        <p>
+          <b>Makluman:</b> Chatbot di halaman ini <b>bukan “ChatGPT biasa”</b>. Ia telah <b>diprogramkan & disusun khusus</b>
+          untuk kesesuaian pengguna di <b>Malaysia</b> (bahasa, konteks tempatan, istilah operasi dan pendidikan pencegahan jenayah),
+          bagi memudahkan rujukan cepat kepada anggota, agensi, sekolah dan komuniti.
+        </p>
+      </div>
+    </section>
+
+    <!-- Moving tagline -->
+    <section class="tagline-strip reveal" aria-label="Tagline bergerak">
+      <div class="strip">
+        <div class="marquee">
+          <span><i></i>SMART PDRM – CEGAH JENAYAH BERSAMA DIGITAL</span>
+          <span><i></i>SEDAR SEBELUM TERKENA – PENDIDIKAN UNTUK SEMUA</span>
+          <span><i></i>PDRM KUANTAN – KOMUNITI LEBIH SELAMAT</span>
+
+          <!-- repeat for smooth loop -->
+          <span><i></i>SMART PDRM – CEGAH JENAYAH BERSAMA DIGITAL</span>
+          <span><i></i>SEDAR SEBELUM TERKENA – PENDIDIKAN UNTUK SEMUA</span>
+          <span><i></i>PDRM KUANTAN – KOMUNITI LEBIH SELAMAT</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section reveal" id="about">
+      <h2>Objektif Landing Page</h2>
+      <p>
+        Halaman ini berfungsi sebagai <b>pusat rujukan pantas</b> untuk menggabungkan semua modul GPT SMART PDRM Kuantan supaya
+        mudah dicapai oleh anggota PDRM, agensi kerajaan, sekolah dan komuniti. Ia menyokong pendidikan, pencegahan jenayah,
+        operasi keselamatan dan pengurusan komuniti melalui pendekatan digital.
+      </p>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="k">Jumlah Modul GPT</div>
+          <div class="v"><span id="modCount">—</span></div>
+        </div>
+        <div class="stat">
+          <div class="k">Status Platform</div>
+          <div class="v">LIVE</div>
+        </div>
+        <div class="stat">
+          <div class="k">Akses</div>
+          <div class="v">1 Klik</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- GPT -->
+    <section class="section reveal" id="gpt">
+      <h2>Senarai GPT SMART PDRM Kuantan</h2>
+      <p>Tekan <b>Akses GPT</b> untuk buka modul. Butang <b>Salin</b> untuk copy link (mudah share dalam WhatsApp/Telegram).</p>
+
+      <div class="gpt-grid" id="gptGrid">
+
+        <div class="gpt-card">
+          <div class="gpt-title">SEDAR – Integriti PDRM</div>
+          <div class="gpt-desc">Panduan integriti, etika, tatatertib & rasuah.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-691d292ea3a08191a98d9e13319f0b26-chatbot-sedar-integriti-pdrm">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-691d292ea3a08191a98d9e13319f0b26-chatbot-sedar-integriti-pdrm">Salin</button>
+          </div>
+        </div>
+
+        <div class="gpt-card">
+          <div class="gpt-title">SEDAR Trafik – Keselamatan Jalan Raya</div>
+          <div class="gpt-desc">Pendidikan trafik & keselamatan pengguna jalan raya.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-690d4b889c48819189fd243c28c57f30-sedartrafik-keselamatan-jalanraya-awam">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-690d4b889c48819189fd243c28c57f30-sedartrafik-keselamatan-jalanraya-awam">Salin</button>
+          </div>
+        </div>
+
+        <div class="gpt-card">
+          <div class="gpt-title">AMANITA – Sahabat Digital Wanita</div>
+          <div class="gpt-desc">Keselamatan wanita, keluarga & bantuan rasmi.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-68158ade5c7c8191b390127e4b06b1f7-gpt-amanita-sahabat-digital-pdrm-untuk-wanita">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-68158ade5c7c8191b390127e4b06b1f7-gpt-amanita-sahabat-digital-pdrm-untuk-wanita">Salin</button>
+          </div>
+        </div>
+
+        <div class="gpt-card">
+          <div class="gpt-title">GPT Bencana – Panduan & Rujukan</div>
+          <div class="gpt-desc">Tindakan bencana, kesiapsiagaan & keselamatan awam.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-680b4ec5119c8191ac75094e8dad480d-gpt-bencana-panduan-dan-rujukan-umum">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-680b4ec5119c8191ac75094e8dad480d-gpt-bencana-panduan-dan-rujukan-umum">Salin</button>
+          </div>
+        </div>
+
+        <div class="gpt-card">
+          <div class="gpt-title">SEDAR – Jenayah Seksual</div>
+          <div class="gpt-desc">Pendidikan perlindungan & kesedaran jenayah seksual.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-680b43d3286c8191a600c54fe2ce2d93-sedar-jenayah-seksual">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-680b43d3286c8191a600c54fe2ce2d93-sedar-jenayah-seksual">Salin</button>
+          </div>
+        </div>
+
+        <div class="gpt-card">
+          <div class="gpt-title">SEDARDadah – Bahaya Penyalahgunaan</div>
+          <div class="gpt-desc">Maklumat dadah, kesan & undang-undang.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-6806e2c944608191bc525cee0e4b4c75-sedardadah-bahaya-pencegahan-dadah">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-6806e2c944608191bc525cee0e4b4c75-sedardadah-bahaya-pencegahan-dadah">Salin</button>
+          </div>
+        </div>
+
+        <div class="gpt-card">
+          <div class="gpt-title">SEDARBuli – Pendidikan & Pencegahan</div>
+          <div class="gpt-desc">Buli fizikal, mental & siber untuk sekolah & komuniti.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-68026762843481919b77a01cfabdd36a-sedarbuli-chatbot-pendidikan-dan-pencegahan-buli">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-68026762843481919b77a01cfabdd36a-sedarbuli-chatbot-pendidikan-dan-pencegahan-buli">Salin</button>
+          </div>
+        </div>
+
+        <div class="gpt-card">
+          <div class="gpt-title">SEDARScam – Elak Jadi Mangsa</div>
+          <div class="gpt-desc">Pengesanan scam, contoh kes & langkah keselamatan.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-68025ae29f2881918d1f81ae3b764a73-sedarscam-elak-jadi-mangsa">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-68025ae29f2881918d1f81ae3b764a73-sedarscam-elak-jadi-mangsa">Salin</button>
+          </div>
+        </div>
+
+        <div class="gpt-card">
+          <div class="gpt-title">GPT IPD Kuantan</div>
+          <div class="gpt-desc">Maklumat rasmi IPD Kuantan untuk masyarakat.</div>
+          <div class="btns">
+            <a class="btn btn-open" target="_blank" rel="noopener"
+               href="https://chatgpt.com/g/g-685eb19015a08191a74481246abc16f2-gpt-ipd-kuantan">Akses GPT ↗</a>
+            <button class="btn btn-copy" data-copy="https://chatgpt.com/g/g-685eb19015a08191a74481246abc16f2-gpt-ipd-kuantan">Salin</button>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SOCIAL -->
+    <section class="section reveal" id="social">
+      <h2>Media Sosial Rasmi IPD Kuantan</h2>
+      <p>Ikuti platform rasmi untuk hebahan operasi, berita & video pendidikan.</p>
+
+      <div class="social">
+        <a class="btn btn-social" target="_blank" rel="noopener"
+           href="https://www.tiktok.com/@polis.kuantan?_r=1&_t=ZS-927xAbvpffg">TikTok Rasmi ↗</a>
+
+        <a class="btn btn-social" target="_blank" rel="noopener"
+           href="https://www.facebook.com/share/1FGuTVLRd2/">Facebook Rasmi ↗</a>
+      </div>
+    </section>
+
+    <footer class="reveal">
+      © <span id="year"></span> SMART PDRM Kuantan – Platform Digital Pendidikan & Kesedaran Jenayah.
+    </footer>
+  </div>
+
+  <div class="toast" id="toast">Disalin.</div>
+
+  <script>
+    // Year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Count modules
+    const cards = document.querySelectorAll(".gpt-card");
+    document.getElementById("modCount").textContent = cards.length;
+
+    // Copy link buttons
+    const toast = document.getElementById("toast");
+    function showToast(msg){
+      toast.textContent = msg;
+      toast.classList.add("show");
+      clearTimeout(window.__t);
+      window.__t = setTimeout(()=>toast.classList.remove("show"), 1200);
+    }
+
+    document.querySelectorAll("[data-copy]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const text = btn.getAttribute("data-copy");
+        try{
+          await navigator.clipboard.writeText(text);
+          showToast("Link disalin ✅");
+        }catch(e){
+          // fallback
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          ta.remove();
+          showToast("Link disalin ✅");
+        }
+      });
+    });
+
+    // Reveal on scroll (safe)
+    const revealEls = document.querySelectorAll(".reveal");
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting) en.target.classList.add("show");
+      });
+    },{threshold:0.12});
+    revealEls.forEach(el=>io.observe(el));
+  </script>
+
+  <!-- ✅ Google Analytics akan kita tampal DI SINI nanti (bila ada Measurement ID G-XXXX) -->
+</body>
+</html>
