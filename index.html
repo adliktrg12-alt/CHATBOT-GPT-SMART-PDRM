@@ -372,6 +372,7 @@
       font-weight: 700;
       letter-spacing:.2px;
       transition:.2s;
+      cursor:pointer;
     }
     .btn.primary{
       background: linear-gradient(135deg, var(--accent), #ff62a6);
@@ -487,10 +488,10 @@
       </p>
 
       <nav>
-        <a href="#about">Objektif</a>
-        <a href="#gpt">Senarai GPT</a>
-        <a href="#guide">Cara Guna</a>
-        <a href="#social">Media Sosial</a>
+        <a href="#about" data-track="nav_objektif">Objektif</a>
+        <a href="#gpt" data-track="nav_senarai_gpt">Senarai GPT</a>
+        <a href="#guide" data-track="nav_cara_guna">Cara Guna</a>
+        <a href="#social" data-track="nav_media_sosial">Media Sosial</a>
       </nav>
 
       <div class="marquee" aria-label="Tagline bergerak">
@@ -550,8 +551,12 @@
       <h2>Media Sosial Rasmi IPD Kuantan</h2>
       <p>Ikuti platform rasmi untuk hebahan operasi, berita & video pendidikan:</p>
       <div class="social">
-        <a class="btn primary" target="_blank" href="https://www.tiktok.com/@polis.kuantan?_r=1&_t=ZS-927xAbvpffg">TikTok Rasmi ↗</a>
-        <a class="btn primary" target="_blank" href="https://www.facebook.com/share/1FGuTVLRd2/">Facebook Rasmi ↗</a>
+        <a class="btn primary" target="_blank" rel="noopener"
+           href="https://www.tiktok.com/@polis.kuantan?_r=1&_t=ZS-927xAbvpffg"
+           data-social="tiktok">TikTok Rasmi ↗</a>
+        <a class="btn primary" target="_blank" rel="noopener"
+           href="https://www.facebook.com/share/1FGuTVLRd2/"
+           data-social="facebook">Facebook Rasmi ↗</a>
       </div>
     </section>
 
@@ -573,69 +578,110 @@
   </div>
 
   <script>
-    // DATA: Semua link GPT (tuan minta masuk semua)
+    // ===== TRACKING HELPER (Kaedah 1) =====
+    function trackEvent(name, params={}){
+      try{
+        if(typeof gtag === "function"){
+          gtag('event', name, Object.assign({
+            transport_type: 'beacon'
+          }, params));
+        }
+      }catch(e){}
+    }
+
+    function trackGPT(action, item){
+      // action: access | copy | whatsapp
+      const ev = `gpt_${item.key}_${action}`;
+      trackEvent(ev, {
+        gpt_key: item.key,
+        gpt_name: item.name,
+        gpt_tag: item.tag,
+        destination: item.url
+      });
+    }
+
+    function trackNav(name){
+      trackEvent(name, {section: name.replace("nav_","")});
+    }
+
+    function trackSocial(which, url){
+      trackEvent(`social_${which}_click`, {destination: url});
+    }
+
+    // DATA: Semua link GPT
     const GPTS = [
       {
+        key:"sedarscam",
         name:"SEDARScam – Elak Jadi Mangsa",
         tag:"Anti-Scam",
         desc:"Pengesanan scam, contoh kes & langkah keselamatan.",
         url:"https://chatgpt.com/g/g-68025ae29f2881918d1f81ae3b764a73-sedarscam-elak-jadi-mangsa"
       },
       {
+        key:"sedarbuli",
         name:"SEDARBuli – Pendidikan & Pencegahan",
         tag:"Anti-Buli",
         desc:"Buli fizikal, mental & siber untuk sekolah & komuniti.",
         url:"https://chatgpt.com/g/g-68026762843481919b77a01cfabdd36a-sedarbuli-chatbot-pendidikan-dan-pencegahan-buli"
       },
       {
+        key:"sedardadah",
         name:"SEDARDadah – Bahaya Penyalahgunaan",
         tag:"Anti-Dadah",
         desc:"Maklumat dadah, kesan & undang-undang.",
         url:"https://chatgpt.com/g/g-6806e2c944608191bc525cee0e4b4c75-sedardadah-bahaya-pencegahan-dadah"
       },
       {
+        key:"sedarrempit",
         name:"SEDARRempit – Bahaya Lumba Haram",
         tag:"Trafik/JPJKK",
         desc:"Kesedaran risiko lumba haram, keselamatan jalan raya & komuniti.",
         url:"https://chatgpt.com/g/g-6807280a730881918eb7088f90f21f42-sedarrempit-bahaya-lumba-haram"
       },
       {
+        key:"sedarseksual",
         name:"SEDAR – Jenayah Seksual",
         tag:"Keselamatan",
         desc:"Pendidikan perlindungan & kesedaran jenayah seksual.",
         url:"https://chatgpt.com/g/g-680b43d3286c8191a600c54fe2ce2d93-sedar-jenayah-seksual"
       },
       {
+        key:"amanita",
         name:"AMANITA – Sahabat Digital Wanita",
         tag:"Amanita",
         desc:"Keselamatan wanita, keluarga & bantuan rasmi.",
         url:"https://chatgpt.com/g/g-68158ade5c7c8191b390127e4b06b1f7-gpt-amanita-sahabat-digital-pdrm-untuk-wanita"
       },
       {
+        key:"bencana",
         name:"GPT Bencana – Panduan & Rujukan",
         tag:"Bencana",
         desc:"Tindakan bencana, kesiapsiagaan & keselamatan awam.",
         url:"https://chatgpt.com/g/g-680b4ec5119c8191ac75094e8dad480d-gpt-bencana-panduan-dan-rujukan-umum"
       },
       {
+        key:"integriti",
         name:"SEDAR – Integriti PDRM",
         tag:"Integriti",
         desc:"Panduan integriti, etika, tatatertib & rasuah.",
         url:"https://chatgpt.com/g/g-691d292ea3a08191a98d9e13319f0b26-chatbot-sedar-integriti-pdrm"
       },
       {
+        key:"trafik",
         name:"SEDAR Trafik – Keselamatan Jalan Raya",
         tag:"Trafik",
         desc:"Pendidikan trafik & keselamatan pengguna jalan raya.",
         url:"https://chatgpt.com/g/g-690d4b889c48819189fd243c28c57f30-sedartrafik-keselamatan-jalanraya-awam"
       },
       {
+        key:"smartpdrm",
         name:"SMART PDRM – Platform Induk",
         tag:"Induk",
         desc:"Pautan induk SMART PDRM – himpunan modul GPT.",
         url:"https://chatgpt.com/g/g-68039f7c96f48191b77a873c806dfd94-smart-pdrm-platform-digital-ai-cegah-jenayah"
       },
       {
+        key:"ipdkuantan",
         name:"GPT IPD Kuantan",
         tag:"Info IPD",
         desc:"Maklumat rasmi IPD Kuantan untuk masyarakat.",
@@ -668,9 +714,9 @@
     document.addEventListener("keydown", (e)=>{ if(e.key==="Escape") closeModal(); });
 
     function copyText(text){
-      navigator.clipboard.writeText(text).then(()=>{
+      navigator.clipboard.writeText(text).then(()=> {
         openModal("Berjaya disalin ✅", `Pautan telah disalin ke clipboard:<code>${escapeHtml(text)}</code>`);
-      }).catch(()=>{
+      }).catch(()=> {
         openModal("Tidak berjaya ❌", `Telefon tidak membenarkan auto-copy. Sila salin manual:<code>${escapeHtml(text)}</code>`);
       });
     }
@@ -695,24 +741,53 @@
           <h3>${escapeHtml(item.name)}</h3>
           <p>${escapeHtml(item.desc)}</p>
           <div class="actions">
-            <a class="btn primary" target="_blank" href="${item.url}">Akses GPT ↗</a>
-            <button class="btn ghost" type="button" data-copy="${item.url}">Copy Link</button>
-            <button class="btn ghost" type="button" data-wa="${item.url}" data-title="${escapeHtml(item.name)}">Share WhatsApp</button>
+            <a class="btn primary" target="_blank" rel="noopener"
+               href="${item.url}"
+               data-access="${item.key}">
+               Akses GPT ↗
+            </a>
+            <button class="btn ghost" type="button" data-copy="${item.key}">Copy Link</button>
+            <button class="btn ghost" type="button" data-wa="${item.key}">Share WhatsApp</button>
             <button class="btn ghost" type="button" data-info="1">Info</button>
           </div>
         `;
         grid.appendChild(card);
       });
 
-      // bind buttons
-      grid.querySelectorAll("button[data-copy]").forEach(btn=>{
-        btn.addEventListener("click", ()=> copyText(btn.getAttribute("data-copy")));
-      });
-      grid.querySelectorAll("button[data-wa]").forEach(btn=>{
-        btn.addEventListener("click", ()=>{
-          openWhatsAppShare(btn.getAttribute("data-title"), btn.getAttribute("data-wa"));
+      // bind Akses GPT
+      grid.querySelectorAll("a[data-access]").forEach(a=>{
+        a.addEventListener("click", ()=>{
+          const key = a.getAttribute("data-access");
+          const item = GPTS.find(x => x.key === key);
+          if(item) trackGPT("access", item);
         });
       });
+
+      // bind Copy Link
+      grid.querySelectorAll("button[data-copy]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const key = btn.getAttribute("data-copy");
+          const item = GPTS.find(x => x.key === key);
+          if(item){
+            trackGPT("copy", item);
+            copyText(item.url);
+          }
+        });
+      });
+
+      // bind Share WhatsApp
+      grid.querySelectorAll("button[data-wa]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const key = btn.getAttribute("data-wa");
+          const item = GPTS.find(x => x.key === key);
+          if(item){
+            trackGPT("whatsapp", item);
+            openWhatsAppShare(item.name, item.url);
+          }
+        });
+      });
+
+      // Info
       grid.querySelectorAll("button[data-info]").forEach(btn=>{
         btn.addEventListener("click", ()=>{
           openModal("Tip Penggunaan GPT", `
@@ -746,10 +821,20 @@
     // Footer year
     document.getElementById("year").textContent = new Date().getFullYear();
 
+    // Track nav clicks
+    document.querySelectorAll('nav a[data-track]').forEach(a=>{
+      a.addEventListener("click", ()=> trackNav(a.getAttribute("data-track")));
+    });
+
+    // Track social clicks
+    document.querySelectorAll('[data-social]').forEach(a=>{
+      a.addEventListener("click", ()=>{
+        trackSocial(a.getAttribute("data-social"), a.getAttribute("href"));
+      });
+    });
+
     // Initial render
     render(GPTS);
   </script>
 </body>
 </html>
-
-      
