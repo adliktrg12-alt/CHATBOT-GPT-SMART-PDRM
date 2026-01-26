@@ -840,17 +840,69 @@
 </div>
 
 <script>
-  // ===== GA4 Helper =====
-  function trackEvent(name, params) {
-    try {
-      if (typeof gtag === "function") {
-        gtag("event", name, Object.assign({ transport_type: "beacon" }, params || {}));
+  // ===== GA4 Helper (UPGRADE: UTM + MODE + page info) =====
+  function getUTM(){
+    const p = new URLSearchParams(location.search);
+    return {
+      utm_source: p.get("utm_source") || "",
+      utm_medium: p.get("utm_medium") || "",
+      utm_campaign: p.get("utm_campaign") || "",
+      utm_content: p.get("utm_content") || "",
+      utm_term: p.get("utm_term") || ""
+    };
+  }
+  function getMode(){
+    const p = new URLSearchParams(location.search);
+    return (p.get("mode") || "").toLowerCase(); // ceramah / booth / normal
+  }
+  function trackEvent(name, params){
+    try{
+      if(typeof gtag === "function"){
+        gtag("event", name, Object.assign({
+          transport_type: "beacon",
+          page_path: location.pathname,
+          page_title: document.title,
+          mode: getMode() || "normal"
+        }, getUTM(), params || {}));
       }
-    } catch (e) {}
+    }catch(e){}
+  }
+  function trackOutbound(label, href, extra){
+    trackEvent("outbound_click", Object.assign({
+      event_label: label || "",
+      destination: href || ""
+    }, extra || {}));
   }
 
   // year
   document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Fire landing event
+  trackEvent("landing_loaded", { event_category: "Landing", event_label: "GPT SMART PDRM" });
+
+  // Scroll depth 25/50/75/90
+  (function(){
+    const marks = [25,50,75,90];
+    const fired = new Set();
+    window.addEventListener("scroll", ()=>{
+      const doc = document.documentElement;
+      const st = doc.scrollTop || document.body.scrollTop;
+      const sh = (doc.scrollHeight || document.body.scrollHeight) - doc.clientHeight;
+      if(sh <= 0) return;
+      const pct = Math.round((st/sh)*100);
+      marks.forEach(m=>{
+        if(pct >= m && !fired.has(m)){
+          fired.add(m);
+          trackEvent("scroll_depth", { percent_scrolled: m, event_label: "scroll_"+m, event_category:"Engagement" });
+        }
+      });
+    }, {passive:true});
+  })();
+
+  // Time on page 30/60/120 sec
+  [30,60,120].forEach(sec=>{
+    setTimeout(()=>trackEvent("time_on_page", { seconds: sec, event_label: "time_"+sec+"s", event_category:"Engagement" }), sec*1000);
+  });
 
   // Mobile menu toggle
   const hamburger = document.getElementById("hamburger");
@@ -860,12 +912,13 @@
       const open = mobileMenu.style.display === "block";
       mobileMenu.style.display = open ? "none" : "block";
       hamburger.setAttribute("aria-expanded", open ? "false" : "true");
-      trackEvent("menu_toggle", { open: open ? 0 : 1 });
+      trackEvent("menu_toggle", { open: open ? 0 : 1, event_category:"UI" });
     });
     mobileMenu.querySelectorAll("a").forEach(a=>{
       a.addEventListener("click", ()=>{
         mobileMenu.style.display = "none";
         hamburger.setAttribute("aria-expanded","false");
+        trackEvent("menu_nav_click", { anchor: a.getAttribute("href") || "", event_category:"UI" });
       });
     });
   }
@@ -997,6 +1050,15 @@
       a.addEventListener("click", ()=>{
         const key = a.getAttribute("data-module");
         const m = MODULES.find(x=>x.key===key);
+
+        // Event jelas ikut modul (KP-friendly)
+        trackEvent("click_" + (m?.key || key), {
+          event_category: "GPT Module",
+          event_label: m?.name || key,
+          destination: m?.url || a.href
+        });
+
+        // Event detail (kekal)
         trackEvent("module_access", {
           module_key: m?.key || key,
           module_name: m?.name || "",
@@ -1004,6 +1066,9 @@
           destination: m?.url || "",
           search_term: (q.value || "").trim() || "(none)"
         });
+
+        // Standard outbound
+        trackOutbound("GPT Module: " + (m?.name || key), (m?.url || a.href), { group: "gpt_module" });
       });
     });
   }
@@ -1022,14 +1087,17 @@
       );
       render(filtered);
       if(s.length >= 2){
-        trackEvent("module_search", { search_term: s, result_count: filtered.length });
+        trackEvent("module_search", { search_term: s, result_count: filtered.length, event_category:"Search" });
       }
     }, 200);
   });
 
+  // Track social + outbound
   document.querySelectorAll("[data-social]").forEach(a=>{
     a.addEventListener("click", ()=>{
-      trackEvent("social_click", { platform: a.getAttribute("data-social"), destination: a.href });
+      const platform = a.getAttribute("data-social");
+      trackEvent("social_click", { platform, destination: a.href, event_category:"Social" });
+      trackOutbound("SOCIAL: " + platform, a.href, { group: "social" });
     });
   });
 
@@ -1040,7 +1108,8 @@
     const url = window.location.href;
     const msg = `GPT SMART PDRM – Platform AI Cegah Jenayah\n\nAkses modul pendidikan & pencegahan (Scam, Buli, Dadah, Trafik, Seksual, Integriti, Bencana, dll.) di pautan berikut:\n${url}`;
     const wa = "https://wa.me/?text=" + encodeURIComponent(msg);
-    trackEvent("share_whatsapp", { destination: wa });
+    trackEvent("share_whatsapp", { destination: wa, event_category:"Share" });
+    trackOutbound("Share WhatsApp", wa, { group:"share" });
     window.open(wa, "_blank", "noopener");
   }
 
@@ -1055,13 +1124,34 @@
       try{
         await navigator.clipboard.writeText(window.location.href);
         btnCopy.innerHTML = `<i class="fa-solid fa-check"></i> Disalin`;
-        trackEvent("copy_link", { ok: 1 });
+        trackEvent("copy_link", { ok: 1, event_category:"Share" });
         setTimeout(()=>btnCopy.innerHTML = `<i class="fa-regular fa-copy"></i> Salin`, 1400);
       }catch(e){
-        trackEvent("copy_link", { ok: 0 });
+        trackEvent("copy_link", { ok: 0, event_category:"Share" });
         alert("Tak dapat salin automatik. Sila salin link dari address bar.");
       }
     });
+  }
+
+  // Auto outbound tracking untuk semua link luar (NSRC/SemakMule/Waze/Maps/TikTok/FB/Google Form dll.)
+  document.querySelectorAll('a[target="_blank"][href]').forEach(a=>{
+    a.addEventListener("click", ()=>{
+      trackOutbound("External Link", a.href, { group: "external" });
+    });
+  });
+
+  // Track klik telefon (tel:)
+  document.querySelectorAll('a[href^="tel:"]').forEach(a=>{
+    a.addEventListener("click", ()=>{
+      trackEvent("click_phone", { phone: a.getAttribute("href"), event_category:"Contact" });
+    });
+  });
+
+  // Mode marker event (optional)
+  if(getMode()==="ceramah"){
+    trackEvent("ceramah_mode_active", { event_category:"Ceramah", event_label:"Mode Ceramah" });
+  } else if(getMode()==="booth"){
+    trackEvent("booth_mode_active", { event_category:"Booth", event_label:"Mode Booth" });
   }
 </script>
 
